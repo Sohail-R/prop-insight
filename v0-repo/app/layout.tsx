@@ -1,14 +1,32 @@
 import type { Metadata } from 'next'
-import { Inter, Geist_Mono } from 'next/font/google'
+import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  display: 'swap',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'PropInsight - Smart Property Analysis',
-  description: 'Analyze and compare properties from Zillow with AI-powered insights',
+  title: 'PropInsight — Property analysis, decoded.',
+  description:
+    'Paste a Zillow link. Get instant, side-by-side intelligence on any home. Built for buyers who refuse to guess.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -35,8 +53,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable} bg-background`}>
-      <body className="font-sans antialiased min-h-screen">
+    <html
+      lang="en"
+      className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} bg-background`}
+    >
+      <body className="font-sans antialiased min-h-screen selection:bg-accent selection:text-accent-foreground">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

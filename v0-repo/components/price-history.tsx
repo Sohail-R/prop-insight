@@ -9,27 +9,25 @@ interface PriceHistoryProps {
 }
 
 export function PriceHistory({ history }: PriceHistoryProps) {
-  if (!history || history.length === 0) {
-    return null
-  }
+  if (!history || history.length === 0) return null
 
   return (
     <div>
-      <h4 className="text-sm font-medium text-foreground mb-3">Price History</h4>
-      <div className="space-y-3">
+      <h4 className="font-display italic text-lg text-foreground mb-2 flex items-center gap-2">
+        <span className="inline-block w-1.5 h-1.5 rotate-45 bg-accent" />
+        Price history
+      </h4>
+      <div className="border border-ink/20 bg-card divide-soft">
         {history.slice(0, 5).map((item, index) => (
-          <div 
-            key={index} 
-            className="flex items-center justify-between py-2 border-b border-border last:border-0"
-          >
+          <div key={index} className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-chart-1" />
+              <span className="w-1.5 h-1.5 rotate-45 bg-foreground" />
               <div>
                 <p className="text-sm font-medium text-foreground">{item.event}</p>
-                <p className="text-xs text-muted-foreground">{item.date}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 italic">{item.date}</p>
               </div>
             </div>
-            <span className="text-sm font-semibold text-foreground">
+            <span className="font-display text-lg text-foreground leading-none">
               {formatCurrency(item.price)}
             </span>
           </div>

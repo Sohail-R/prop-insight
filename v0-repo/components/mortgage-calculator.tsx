@@ -19,71 +19,52 @@ export function MortgageCalculator({ price, propertyTax = 0, hoaFees = 0 }: Mort
     const loanAmount = price - downPayment
     const monthlyRate = interestRate / 100 / 12
     const numPayments = loanTerm * 12
-
-    // Monthly principal & interest
     const monthlyPI =
       monthlyRate === 0
         ? loanAmount / numPayments
         : (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) /
           (Math.pow(1 + monthlyRate, numPayments) - 1)
-
-    // Monthly property tax
     const monthlyTax = propertyTax / 12
-
-    // Total monthly payment
     const totalMonthly = monthlyPI + monthlyTax + hoaFees
-
-    // Total interest over life of loan
     const totalInterest = monthlyPI * numPayments - loanAmount
 
-    return {
-      downPayment,
-      loanAmount,
-      monthlyPI,
-      monthlyTax,
-      totalMonthly,
-      totalInterest,
-    }
+    return { downPayment, loanAmount, monthlyPI, monthlyTax, totalMonthly, totalInterest }
   }, [price, downPaymentPercent, interestRate, loanTerm, propertyTax, hoaFees])
 
   return (
     <div className="space-y-6">
-      {/* Results Summary */}
-      <div className="p-4 bg-primary/5 rounded-xl border border-primary/10">
-        <p className="text-sm text-muted-foreground mb-1">Estimated Monthly Payment</p>
-        <p className="text-3xl font-bold text-foreground">
-          {formatCurrency(calculations.totalMonthly)}
-        </p>
+      {/* Result */}
+      <div className="border border-ink/20 bg-accent/30">
+        <div className="border-b border-ink/15 px-4 py-2.5 bg-foreground text-background">
+          <span className="text-sm font-medium">
+            <span className="font-display italic mr-1.5">Your</span>
+            estimated monthly payment
+          </span>
+        </div>
+        <div className="p-5">
+          <p className="font-display text-5xl text-foreground leading-none">
+            {formatCurrency(calculations.totalMonthly)}
+          </p>
+        </div>
       </div>
 
-      {/* Payment Breakdown */}
-      <div className="space-y-3">
-        <h4 className="text-sm font-medium text-foreground">Payment Breakdown</h4>
-        <div className="space-y-2">
-          <BreakdownRow 
-            label="Principal & Interest" 
-            value={formatCurrency(calculations.monthlyPI)}
-            color="bg-chart-1"
-          />
-          <BreakdownRow 
-            label="Property Tax" 
-            value={formatCurrency(calculations.monthlyTax)}
-            color="bg-chart-2"
-          />
-          {hoaFees > 0 && (
-            <BreakdownRow 
-              label="HOA Fees" 
-              value={formatCurrency(hoaFees)}
-              color="bg-chart-3"
-            />
-          )}
+      {/* Breakdown */}
+      <div>
+        <h4 className="font-display italic text-lg text-foreground mb-2 flex items-center gap-2">
+          <span className="inline-block w-1.5 h-1.5 rotate-45 bg-accent" />
+          Breakdown
+        </h4>
+        <div className="border border-ink/20 bg-card divide-soft">
+          <BreakdownRow label="Principal &amp; interest" value={formatCurrency(calculations.monthlyPI)} />
+          <BreakdownRow label="Property tax" value={formatCurrency(calculations.monthlyTax)} />
+          {hoaFees > 0 && <BreakdownRow label="HOA fees" value={formatCurrency(hoaFees)} />}
         </div>
       </div>
 
       {/* Sliders */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <SliderInput
-          label="Down Payment"
+          label="Down payment"
           value={downPaymentPercent}
           onChange={setDownPaymentPercent}
           min={0}
@@ -92,9 +73,8 @@ export function MortgageCalculator({ price, propertyTax = 0, hoaFees = 0 }: Mort
           suffix="%"
           secondaryValue={formatCurrency(calculations.downPayment)}
         />
-
         <SliderInput
-          label="Interest Rate"
+          label="Interest rate"
           value={interestRate}
           onChange={setInterestRate}
           min={1}
@@ -105,18 +85,16 @@ export function MortgageCalculator({ price, propertyTax = 0, hoaFees = 0 }: Mort
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-foreground">Loan Term</span>
+            <span className="text-sm text-muted-foreground">Loan term</span>
           </div>
-          <div className="flex gap-2">
-            {[15, 20, 30].map((term) => (
+          <div className="flex border border-ink/30 rounded-sm overflow-hidden">
+            {[15, 20, 30].map((term, i) => (
               <button
                 key={term}
                 onClick={() => setLoanTerm(term)}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                  loanTerm === term
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                }`}
+                className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                  i > 0 ? 'border-l border-ink/15' : ''
+                } ${loanTerm === term ? 'bg-foreground text-background' : 'bg-card text-foreground hover:bg-muted'}`}
               >
                 {term} years
               </button>
@@ -125,29 +103,29 @@ export function MortgageCalculator({ price, propertyTax = 0, hoaFees = 0 }: Mort
         </div>
       </div>
 
-      {/* Additional Info */}
-      <div className="pt-4 border-t border-border space-y-2">
-        <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Loan Amount</span>
-          <span className="font-medium text-foreground">{formatCurrency(calculations.loanAmount)}</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Total Interest</span>
-          <span className="font-medium text-foreground">{formatCurrency(calculations.totalInterest)}</span>
-        </div>
+      {/* Loan info */}
+      <div className="border-t border-ink/15 pt-4 space-y-2">
+        <InfoRow label="Loan amount" value={formatCurrency(calculations.loanAmount)} />
+        <InfoRow label="Total interest" value={formatCurrency(calculations.totalInterest)} />
       </div>
     </div>
   )
 }
 
-function BreakdownRow({ label, value, color }: { label: string; value: string; color: string }) {
+function BreakdownRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between px-4 py-3">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="font-display text-lg text-foreground leading-none">{value}</span>
+    </div>
+  )
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <span className={`w-3 h-3 rounded-full ${color}`} />
-        <span className="text-sm text-muted-foreground">{label}</span>
-      </div>
-      <span className="text-sm font-medium text-foreground">{value}</span>
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="font-display text-base text-foreground">{value}</span>
     </div>
   )
 }
@@ -174,24 +152,27 @@ function SliderInput({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-foreground">{label}</span>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-foreground">
-            {value}{suffix}
+        <span className="text-sm text-muted-foreground">{label}</span>
+        <div className="flex items-baseline gap-2">
+          <span className="font-display text-xl text-foreground leading-none">
+            {value}
+            {suffix}
           </span>
           {secondaryValue && (
-            <span className="text-xs text-muted-foreground">({secondaryValue})</span>
+            <span className="text-sm text-muted-foreground italic">
+              ({secondaryValue})
+            </span>
           )}
         </div>
       </div>
       <input
         type="range"
         value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
+        onChange={e => onChange(Number(e.target.value))}
         min={min}
         max={max}
         step={step}
-        className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+        className="w-full h-1 bg-foreground/30 appearance-none cursor-pointer accent-foreground rounded-full"
       />
     </div>
   )
